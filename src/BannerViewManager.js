@@ -8,8 +8,9 @@
  * @flow
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
 import { requireNativeComponent, StyleSheet, View } from 'react-native';
+import PropTypes from 'prop-types';
 
 type AdType = 'large' | 'rectangle' | 'standard';
 
