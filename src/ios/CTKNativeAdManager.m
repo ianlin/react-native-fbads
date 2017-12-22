@@ -28,6 +28,7 @@ RCT_ENUM_CONVERTER(FBNativeAdsCachePolicy, (@{
 @interface CTKNativeAdManager () <FBNativeAdsManagerDelegate>
 
 @property (nonatomic, strong) NSMutableDictionary<NSString*, FBNativeAdsManager*> *adsManagers;
+@property (nonatomic, strong) NSString *myPlacementId;
 
 @end
 
@@ -47,6 +48,8 @@ RCT_EXPORT_MODULE()
 
 RCT_EXPORT_METHOD(init:(NSString *)placementId withAdsToRequest:(NSInteger*)adsToRequest) {
   FBNativeAdsManager *adsManager = [[FBNativeAdsManager alloc] initWithPlacementID:placementId forNumAdsRequested:adsToRequest];
+
+  self.myPlacementId = placementId;
 
   __weak typeof(self) weakSelf = self;
   [adsManager setDelegate:weakSelf];
@@ -83,7 +86,13 @@ RCT_EXPORT_METHOD(disableAutoRefresh:(NSString*)placementId) {
 }
 
 - (UIView *)view {
-  return [CTKNativeAdView new];
+  CTKNativeAdView *adView = [CTKNativeAdView new];
+  FBNativeAd *nativeAd = [_adsManagers[self.myPlacementId] nextNativeAd];
+  FBAdChoicesView *adChoicesView = [[FBAdChoicesView alloc] initWithNativeAd:nativeAd expandable:true];
+  [adView addSubview:adChoicesView];
+  [adView bringSubviewToFront:adChoicesView];
+  [adChoicesView updateFrameFromSuperview:(UIRectCornerTopLeft)];
+  return adView;
 }
 
 RCT_EXPORT_VIEW_PROPERTY(onAdLoaded, RCTBubblingEventBlock)
